@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>CartoDB + Time</title>
+    <title>Debate Presidencial 2015</title>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/locale/es.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
@@ -29,10 +29,11 @@
         }
         #controles {
           position: absolute;
-          right: 40px;
-          bottom: 40px;
-          padding: 20px;
-          background: rgba(80,80,80,.5);
+          right: 0;
+          bottom: 20px;
+          padding: 27px;
+          background: rgba(35,35,35,.7);
+          z-index: 1500;
           z-index: 1500;
         }
         #torque-slider {
@@ -59,7 +60,9 @@
 
         #torque-time {
           color: white;
-          font-size: 31px;
+          font-size: 24px;
+          margin-bottom: 5px;
+          line-height: 1;
         }
 
         .CodeMirror {
@@ -126,7 +129,11 @@
           font-family: Montserrat;
           line-height: 1.1;
           color: white;
+          padding: 15px 30px 15px 20px;
+          background: rgba(40,40,40,.7);
         }
+
+        #intro-debate h1 { margin: 0px }
     </style>
   </head>
 
@@ -218,7 +225,7 @@
           torqueLayer = new torque.GMapsTorqueLayer(_.extend({
             provider: 'sql_api',
             user       : 'hhrosario',
-            table      : 'debate',
+            table      : 'final',
             column     : 'date',
             countby    : 'count(cartodb_id)',
             loop       : true,
@@ -234,12 +241,7 @@
           torqueLayer.setCartoCSS(DEFAULT_CARTOCSS);
 
           init_slider(torqueLayer);
-          if(ui_enabled) {
-            init_ui(map, torqueLayer);
-          } else {
-            var textarea = document.getElementById('code')
-            textarea.parentNode.removeChild(textarea);
-          }
+
           torqueLayer.on('change:bounds', function(changes) {
               var bounds = changes.bounds;
               var b = new google.maps.LatLngBounds(
@@ -327,12 +329,16 @@
 
         // each time time changes, move the slider
         torqueLayer.on('change:time', function(changes) {
-          $("#torque-slider" ).slider({ value: changes.step });
-          var month_year = changes.time.toString().substr(4).split(' ');
 
+          $("#torque-slider" ).slider({ value: changes.step });
+
+          var month_year = changes.time.toString().substr(4).split(' ');
           var day = moment(changes.time.toString());
 
-          torqueTime.text(day.format("H:mm:ss"));
+          if(day.format("H:mm:ss") != "Invalid date") {
+            torqueTime.text(day.format("H:mm:ss"));
+          }
+
         });
 
         // play-pause toggle
